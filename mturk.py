@@ -10,6 +10,8 @@ from collections import defaultdict
 HIT1_MAX_ASSIGN = 1
 HIT2_MAX_ASSIGN = 1
 
+SANDBOX = True
+
 def createQualification(language): #returns the qualType
 	title = "English to " + language + " Translator Qualification"
 	descrip = "Obtain a qualification to complete tasks requiring translation from English to " + language
@@ -238,7 +240,7 @@ def keyWithMaxVal(dic):
  
 ACCESS_ID ='***REMOVED***'
 SECRET_KEY = '***REMOVED***'
-HOST = 'mechanicalturk.sandbox.amazonaws.com'
+HOST = if SANDBOX: 'mechanicalturk.sandbox.amazonaws.com' else: 'mechanicalturk.amazonaws.com'
 QUALIFICATION_ID = '***REMOVED***'
 
 hitIds = Set()
