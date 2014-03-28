@@ -10,6 +10,8 @@ from collections import defaultdict
 HIT1_MAX_ASSIGN = 1
 HIT2_MAX_ASSIGN = 1
 
+SANDBOX = True
+
 def createQualification(language): #returns the qualType
 	title = "English to " + language + " Translator Qualification"
 	descrip = "Obtain a qualification to complete tasks requiring translation from English to " + language
@@ -216,6 +218,9 @@ def waitUntilHIT1Complete(mtc, hitIds):
 	rev_hitIds = Set()
 	while True:
 		print('Waiting for HITs to be completed')
+		#check for qualification requests
+		#if there are any, and the turker passed the test, grant the qualificatioins
+		qualifyWorker()
 		time.sleep(30) #sleep for 1 min
 		rev_hits = get_all_reviewable_hits(mtc)
 		for rev_hit in rev_hits:
@@ -235,7 +240,7 @@ def keyWithMaxVal(dic):
  
 ACCESS_ID ='***REMOVED***'
 SECRET_KEY = '***REMOVED***'
-HOST = 'mechanicalturk.sandbox.amazonaws.com'
+HOST = if SANDBOX: 'mechanicalturk.sandbox.amazonaws.com' else: 'mechanicalturk.amazonaws.com'
 QUALIFICATION_ID = '***REMOVED***'
 
 hitIds = Set()
@@ -257,9 +262,7 @@ tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 
 sentences = tokenizer.tokenize(data)
 
-#check for qualification requests
-#if there are any, and the turker passed the test, grant the qualificatioins
-qualifyWorker()
+
 
 for sentence in sentences:
 	hitId, sentence = createHIT1(sentence)
