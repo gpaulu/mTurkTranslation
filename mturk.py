@@ -216,6 +216,9 @@ def waitUntilHIT1Complete(mtc, hitIds):
 	rev_hitIds = Set()
 	while True:
 		print('Waiting for HITs to be completed')
+		#check for qualification requests
+		#if there are any, and the turker passed the test, grant the qualificatioins
+		qualifyWorker()
 		time.sleep(30) #sleep for 1 min
 		rev_hits = get_all_reviewable_hits(mtc)
 		for rev_hit in rev_hits:
@@ -256,9 +259,7 @@ tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 
 sentences = tokenizer.tokenize(to_trans)
 
-#check for qualification requests
-#if there are any, and the turker passed the test, grant the qualificatioins
-qualifyWorker()
+
 
 for sentence in sentences:
 	hitId, sentence = createHIT1(sentence)
