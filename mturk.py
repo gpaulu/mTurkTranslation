@@ -84,7 +84,7 @@ def qualifyWorker():
 		for answers in questFormAnswer:
 			for answer in answers[0].fields:
 				workerAnswer = answer
-				print workerAnswer
+				#print workerAnswer
 				qualReqID = request.QualificationRequestId
 				#check answer for key words
 				if workerAnswer.find("always") and workerAnswer.find("eat") and workerAnswer.find("eggs") and workerAnswer.find("breakfast") and (workerAnswer.find("wake") or workerAnswer.find("get")):
@@ -92,7 +92,7 @@ def qualifyWorker():
 				else:
 					mtc.reject_qualification_request(qualReqID)
 
-def createHIT1(to_trans):
+def createHIT1(to_trans,context):
 
 	
 	
@@ -105,13 +105,13 @@ def createHIT1(to_trans):
 	 
 	overview = Overview()
 	overview.append_field('Title', title)
-	overview.append(FormattedContent(to_trans))
+	overview.append(FormattedContent('<p>' + context + '</p>' + '<p><b>' + to_trans + '</b></p>'))
 	 
 	 
 	#---------------  BUILD QUESTION 2 -------------------
 	 
 	qc1 = QuestionContent()
-	qc1.append_field('Title','Please translate the sentence')
+	qc1.append_field('Title','Please translate the bolded sentence')
 	 
 	fta1 = FreeTextAnswer()
 	 
@@ -237,10 +237,16 @@ def keyWithMaxVal(dic):
 			max_key = key
 	return max_key
 
+def getContext(idx, sentences):
+	ret = ''
+	for sentenceInx in xrange(max(0,idx-4),min(len(sentences),idx+4)):
+		ret += sentences[sentenceInx]
+	return ret
+
  
 ACCESS_ID ='***REMOVED***'
 SECRET_KEY = '***REMOVED***'
-HOST = if SANDBOX: 'mechanicalturk.sandbox.amazonaws.com' else: 'mechanicalturk.amazonaws.com'
+HOST = 'mechanicalturk.sandbox.amazonaws.com' if SANDBOX  else 'mechanicalturk.amazonaws.com'
 QUALIFICATION_ID = '***REMOVED***'
 
 hitIds = Set()
@@ -263,10 +269,10 @@ sentences = tokenizer.tokenize(to_trans)
 
 
 
-for sentence in sentences:
-	hitId, sentence = createHIT1(sentence)
+for idx, sentence in enumerate(sentences):
+	hitId, sentence2 = createHIT1(sentence,getContext(idx,sentences))
 	hitIds.add(hitId)
-	hitsDic[hitId] = sentence
+	hitsDic[hitId] = sentence2
 
 rev_hits = waitUntilHIT1Complete(mtc,hitIds)
 
