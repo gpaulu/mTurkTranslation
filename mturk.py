@@ -82,7 +82,7 @@ def qualifyWorker():
 		for answers in questFormAnswer:
 			for answer in answers[0].fields:
 				workerAnswer = answer
-				print workerAnswer
+				#print workerAnswer
 				qualReqID = request.QualificationRequestId
 				#check answer for key words
 				if workerAnswer.find("always") and workerAnswer.find("eat") and workerAnswer.find("eggs") and workerAnswer.find("breakfast") and (workerAnswer.find("wake") or workerAnswer.find("get")):
@@ -249,12 +249,13 @@ mtc = MTurkConnection(aws_access_key_id=ACCESS_ID,
 				  
 #qualification_type = createQualification("Spanish") #use this to edit our qualification. WILL REQUIRE NEW NAME, OR DELETING THE OLD ONE
 qualification_type = mtc.get_qualification_type(QUALIFICATION_ID)[0]
-to_trans = raw_input('Input text to translate: ')
-
+to_trans = raw_input('Input test file to translate: ')
+with open(to_trans, "r") as myfile:
+	data=myfile.read()
 #do magin nltk stuff to find sentences
 tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 
-sentences = tokenizer.tokenize(to_trans)
+sentences = tokenizer.tokenize(data)
 
 #check for qualification requests
 #if there are any, and the turker passed the test, grant the qualificatioins
