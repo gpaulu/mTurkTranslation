@@ -237,15 +237,25 @@ def keyWithMaxVal(dic):
 			max_key = key
 	return max_key
 
+#fuction to delete existing hits, only for testing purposes
+def deleteExistingHITs():
+	existingHits = list(mtc.get_all_hits())
+	for hit in existingHits:
+		mtc.disable_hit(hit.HITId)
+	return
  
 ACCESS_ID ='***REMOVED***'
 SECRET_KEY = '***REMOVED***'
-HOST = if SANDBOX: 'mechanicalturk.sandbox.amazonaws.com' else: 'mechanicalturk.amazonaws.com'
+if SANDBOX:
+	HOST = 'mechanicalturk.sandbox.amazonaws.com' 
+else: 
+	HOST = 'mechanicalturk.amazonaws.com'
 QUALIFICATION_ID = '***REMOVED***'
 
 hitIds = Set()
 hitsDic = {}
- 
+
+
 mtc = MTurkConnection(aws_access_key_id=ACCESS_ID,
 					  aws_secret_access_key=SECRET_KEY,
 					  host=HOST)
@@ -262,7 +272,7 @@ tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 
 sentences = tokenizer.tokenize(data)
 
-
+#deleteExistingHITs() #uncomment for testing
 
 for sentence in sentences:
 	hitId, sentence = createHIT1(sentence)
