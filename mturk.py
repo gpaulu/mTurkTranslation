@@ -243,6 +243,12 @@ def getContext(idx, sentences):
 		ret += ' ' + sentences[sentenceInx]
 	return ret.strip()
 
+#fuction to delete existing hits, only for testing purposes
+def deleteExistingHITs():
+	existingHits = list(mtc.get_all_hits())
+	for hit in existingHits:
+		mtc.disable_hit(hit.HITId)
+	return
  
 ACCESS_ID ='***REMOVED***'
 SECRET_KEY = '***REMOVED***'
@@ -251,7 +257,8 @@ QUALIFICATION_ID = '***REMOVED***'
 
 hitIds = Set()
 hitsDic = {}
- 
+
+
 mtc = MTurkConnection(aws_access_key_id=ACCESS_ID,
 					  aws_secret_access_key=SECRET_KEY,
 					  host=HOST)
@@ -260,14 +267,15 @@ mtc = MTurkConnection(aws_access_key_id=ACCESS_ID,
 				  
 #qualification_type = createQualification("Spanish") #use this to edit our qualification. WILL REQUIRE NEW NAME, OR DELETING THE OLD ONE
 qualification_type = mtc.get_qualification_type(QUALIFICATION_ID)[0]
-to_trans = raw_input('Input text to translate: ')
-
+to_trans = raw_input('Input test file to translate: ')
+with open(to_trans, "r") as myfile:
+	data=myfile.read()
 #do magin nltk stuff to find sentences
 tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 
-sentences = tokenizer.tokenize(to_trans)
+sentences = tokenizer.tokenize(data)
 
-
+#deleteExistingHITs() #uncomment for testing
 
 for idx, sentence in enumerate(sentences):
 	context = getContext(idx,sentences)
