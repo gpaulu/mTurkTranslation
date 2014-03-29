@@ -137,7 +137,7 @@ def createHIT1(to_trans,context):
 				   description=description,
 				   keywords=keywords,
 				   duration = 60*5,
-	               		   reward=0.05,
+	               reward=0.05,
 				   qualifications=quals)
 
 	
@@ -183,7 +183,12 @@ def createHIT2(possibleAnswers,sentence, context):
 	question_form = QuestionForm()
 	question_form.append(overview)
 	question_form.append(q1)
-	 
+
+	#--------------- CREATE QUALIFICATION REQUIREMENT -------------------
+	qual_req = Requirement(qualification_type_id=QUALIFICATION_ID,
+					comparator="Exists")
+	
+	quals = Qualifications(requirements=[qual_req]) 
 	#--------------- CREATE THE HIT -------------------
 	 
 	resultSet = mtc.create_hit(questions=question_form,
@@ -192,7 +197,8 @@ def createHIT2(possibleAnswers,sentence, context):
 				   description=description,
 				   keywords=keywords,
 				   duration = 60*5,
-				   reward=0.05)
+				   reward=0.05,
+				   qualifications=quals)
 
 	
 	return (resultSet[0].HITId,ratingsDic)
