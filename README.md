@@ -15,13 +15,18 @@ This program helps to solve the problem. The program uses 'Amazon Mechanical Tur
 
 
 
-<br>**Instruction**
-- You need your AWS access key and secret key. (line number is ###)
-- Make sure you have 'pip install'. Then do 'pip install pyyaml nltk' to install NLTK for the sentence parsing library. Test the installation by running 'python import nltk'. Run 'nltk.download()' from python to open the NLTK downloader. Then download 'punk' from the Models menu.
-- Make sure you have 'boto'. There is a tutorial in the website
+<br>**Setup Instructions**
+- You need your AWS access key and secret key. These will need to be used in "mturk.py" on lines ###, and in "createQualificationType.py" on lines 65 and 66
+- Make sure you have 'pip' installed. Then run 'pip install pyyaml nltk' to install NLTK for the sentence parsing library. Test the installation by running 'python import nltk'. Run 'nltk.download()' from python to open the NLTK downloader. Then download 'punkt' from the Models menu.
+- Make sure you have 'boto' installed. There is a tutorial in the website
 http://boto.readthedocs.org/en/latest/ 
-- You need to save a text file with the code in the source folder.
-- If you wish to submit to the hit to the SANDBOX, change SANDBOX value to TRUE
+- You need to save a text file for your input in the source folder. We have provided "giveMouseCookie.txt" as a sample.
+- If you wish to submit to the HIT to the SANDBOX, change SANDBOX value to true, on line 8 in "createQualificationType.py", and on line ### in "mturk.py"
 - To change the number of HITs per sentence, change the value of HIT1_MAX_ASSIGN and HIT2_MAX_ASSIGN (HIT1 for translation task and HIT2 for the selection task)
-- First time you run it creates qualitification type, uncommand the line number ###
-- You can run 'python mturk.py' from the command promt.
+
+
+<br>**Running the Program**
+- Run "python createQualificationType.py" to create a Qualification that is linked to your account. This only needs to be run once, and you can check that the qualification exists from your Requester Dashboard under Manage->Qualifcation Types
+- Run "python mturk.py" and enter the file name (e.g. Input test file to translate: giveMouseCookie.txt)
+- A message will appear indicating that the program is "Waiting for HITs to be completed", which will iterate every 30 seconds. 
+- When a HIT is submitted by a qualified worker, the result is stored. Once several workers submit answers for the same sentence, the second HIT is created to have qualified workers vote on the best translation.
