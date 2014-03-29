@@ -256,10 +256,10 @@ def deleteExistingHITs():
 		mtc.disable_hit(hit.HITId)
 	return
  
-ACCESS_ID ='***REMOVED***'
-SECRET_KEY = '***REMOVED***'
+ACCESS_ID =''
+SECRET_KEY = ''
 HOST = 'mechanicalturk.sandbox.amazonaws.com' if SANDBOX  else 'mechanicalturk.amazonaws.com'
-QUALIFICATION_ID = '***REMOVED***'
+QUALIFICATION_ID = ''
 
 hitIds = Set()
 hitsDic = {}

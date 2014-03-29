@@ -62,8 +62,8 @@ def createQualification(language): #returns the qualType
 					
 	return qualType
 
-ACCESS_ID ='***REMOVED***'
-SECRET_KEY = '***REMOVED***'
+ACCESS_ID =''
+SECRET_KEY = ''
 if SANDBOX:
 	HOST = 'mechanicalturk.sandbox.amazonaws.com' 
 else: 
