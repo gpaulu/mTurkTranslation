@@ -141,9 +141,9 @@ def createHIT1(to_trans,context):
 				   qualifications=quals)
 
 	
-	return (resultSet[0].HITId,to_trans)
+	return resultSet[0].HITId
 
-def createHIT2(possibleAnswers,sentence):
+def createHIT2(possibleAnswers,sentence, context):
 	title = 'Pick the best translation!'
 	description = ('Pick the best translation!')
 	keywords = 'translate, language'
@@ -160,13 +160,13 @@ def createHIT2(possibleAnswers,sentence):
 	 
 	overview = Overview()
 	overview.append_field('Title', title)
-	overview.append(FormattedContent(sentence))
+	overview.append(FormattedContent('<p>' + context + '</p>' + '<p><b>' + sentence + '</b></p>'))
 	 
 	 
 	#---------------  BUILD QUESTION 2 -------------------
 	 
 	qc1 = QuestionContent()
-	qc1.append_field('Title','Please pick the best translation for the sentence above.')
+	qc1.append_field('Title','Please pick the best translation for the bolded sentence above.')
 	 
 	fta1 = SelectionAnswer(min=1, max=1,style='radiobutton',
                       selections=ratings,
@@ -195,7 +195,7 @@ def createHIT2(possibleAnswers,sentence):
 				   reward=0.05)
 
 	
-	return (resultSet[0].HITId,sentence,ratingsDic)
+	return (resultSet[0].HITId,ratingsDic)
 
 def get_all_reviewable_hits(mtc):
 	page_size = 50
@@ -240,8 +240,8 @@ def keyWithMaxVal(dic):
 def getContext(idx, sentences):
 	ret = ''
 	for sentenceInx in xrange(max(0,idx-4),min(len(sentences),idx+4)):
-		ret += sentences[sentenceInx]
-	return ret
+		ret += ' ' + sentences[sentenceInx]
+	return ret.strip()
 
  
 ACCESS_ID ='***REMOVED***'
@@ -270,9 +270,10 @@ sentences = tokenizer.tokenize(to_trans)
 
 
 for idx, sentence in enumerate(sentences):
-	hitId, sentence2 = createHIT1(sentence,getContext(idx,sentences))
+	context = getContext(idx,sentences)
+	hitId = createHIT1(sentence,context)
 	hitIds.add(hitId)
-	hitsDic[hitId] = sentence2
+	hitsDic[hitId] = (sentence, context)
 
 rev_hits = waitUntilHIT1Complete(mtc,hitIds)
 
@@ -297,9 +298,10 @@ hitIds = Set()
 answersDic = {}
 
 for key, val in possibleAns.iteritems():
-	hitId, sentence, answers = createHIT2(val,key)
+	sentence, context = key
+	hitId, answers = createHIT2(val,sentence,context)
 	hitIds.add(hitId)
-	hitsDic[hitId] = sentence
+	hitsDic[hitId] = (sentence, context)
 	answersDic[sentence] = answers
 
 rev_hits = waitUntilHIT1Complete(mtc,hitIds)
@@ -327,7 +329,8 @@ for hit in rev_hits:
 
 translations = {}
 
-for sentence, dic in votes.iteritems():
+for key, dic in votes.iteritems():
+	sentence, context = key
 	translations[sentence] = answersDic[sentence][keyWithMaxVal(dic)]
 
 for sentence in sentences:
