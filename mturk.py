@@ -92,7 +92,7 @@ def qualifyWorker():
 				else:
 					mtc.reject_qualification_request(qualReqID)
 
-def createHIT1(to_trans):
+def createHIT1(to_trans,context):
 
 	
 	
@@ -105,13 +105,13 @@ def createHIT1(to_trans):
 	 
 	overview = Overview()
 	overview.append_field('Title', title)
-	overview.append(FormattedContent(to_trans))
+	overview.append(FormattedContent('<p>' + context + '</p>' + '<p><b>' + to_trans + '</b></p>'))
 	 
 	 
 	#---------------  BUILD QUESTION 2 -------------------
 	 
 	qc1 = QuestionContent()
-	qc1.append_field('Title','Please translate the sentence')
+	qc1.append_field('Title','Please translate the bolded sentence')
 	 
 	fta1 = FreeTextAnswer()
 	 
@@ -137,13 +137,13 @@ def createHIT1(to_trans):
 				   description=description,
 				   keywords=keywords,
 				   duration = 60*5,
-	               		   reward=0.05,
+	               reward=0.05,
 				   qualifications=quals)
 
 	
-	return (resultSet[0].HITId,to_trans)
+	return resultSet[0].HITId
 
-def createHIT2(possibleAnswers,sentence):
+def createHIT2(possibleAnswers,sentence, context):
 	title = 'Pick the best translation!'
 	description = ('Pick the best translation!')
 	keywords = 'translate, language'
@@ -160,13 +160,13 @@ def createHIT2(possibleAnswers,sentence):
 	 
 	overview = Overview()
 	overview.append_field('Title', title)
-	overview.append(FormattedContent(sentence))
+	overview.append(FormattedContent('<p>' + context + '</p>' + '<p><b>' + sentence + '</b></p>'))
 	 
 	 
 	#---------------  BUILD QUESTION 2 -------------------
 	 
 	qc1 = QuestionContent()
-	qc1.append_field('Title','Please pick the best translation for the sentence above.')
+	qc1.append_field('Title','Please pick the best translation for the bolded sentence above.')
 	 
 	fta1 = SelectionAnswer(min=1, max=1,style='radiobutton',
                       selections=ratings,
@@ -183,7 +183,12 @@ def createHIT2(possibleAnswers,sentence):
 	question_form = QuestionForm()
 	question_form.append(overview)
 	question_form.append(q1)
-	 
+
+	#--------------- CREATE QUALIFICATION REQUIREMENT -------------------
+	qual_req = Requirement(qualification_type_id=QUALIFICATION_ID,
+					comparator="Exists")
+	
+	quals = Qualifications(requirements=[qual_req]) 
 	#--------------- CREATE THE HIT -------------------
 	 
 	resultSet = mtc.create_hit(questions=question_form,
@@ -192,10 +197,11 @@ def createHIT2(possibleAnswers,sentence):
 				   description=description,
 				   keywords=keywords,
 				   duration = 60*5,
-				   reward=0.05)
+				   reward=0.05,
+				   qualifications=quals)
 
 	
-	return (resultSet[0].HITId,sentence,ratingsDic)
+	return (resultSet[0].HITId,ratingsDic)
 
 def get_all_reviewable_hits(mtc):
 	page_size = 50
@@ -237,6 +243,12 @@ def keyWithMaxVal(dic):
 			max_key = key
 	return max_key
 
+def getContext(idx, sentences):
+	ret = ''
+	for sentenceInx in xrange(max(0,idx-4),min(len(sentences),idx+4)):
+		ret += ' ' + sentences[sentenceInx]
+	return ret.strip()
+
 #fuction to delete existing hits, only for testing purposes
 def deleteExistingHITs():
 	existingHits = list(mtc.get_all_hits())
@@ -246,10 +258,7 @@ def deleteExistingHITs():
  
 ACCESS_ID ='***REMOVED***'
 SECRET_KEY = '***REMOVED***'
-if SANDBOX:
-	HOST = 'mechanicalturk.sandbox.amazonaws.com' 
-else: 
-	HOST = 'mechanicalturk.amazonaws.com'
+HOST = 'mechanicalturk.sandbox.amazonaws.com' if SANDBOX  else 'mechanicalturk.amazonaws.com'
 QUALIFICATION_ID = '***REMOVED***'
 
 hitIds = Set()
@@ -274,10 +283,11 @@ sentences = tokenizer.tokenize(data)
 
 #deleteExistingHITs() #uncomment for testing
 
-for sentence in sentences:
-	hitId, sentence = createHIT1(sentence)
+for idx, sentence in enumerate(sentences):
+	context = getContext(idx,sentences)
+	hitId = createHIT1(sentence,context)
 	hitIds.add(hitId)
-	hitsDic[hitId] = sentence
+	hitsDic[hitId] = (sentence, context)
 
 rev_hits = waitUntilHIT1Complete(mtc,hitIds)
 
@@ -302,9 +312,10 @@ hitIds = Set()
 answersDic = {}
 
 for key, val in possibleAns.iteritems():
-	hitId, sentence, answers = createHIT2(val,key)
+	sentence, context = key
+	hitId, answers = createHIT2(val,sentence,context)
 	hitIds.add(hitId)
-	hitsDic[hitId] = sentence
+	hitsDic[hitId] = (sentence, context)
 	answersDic[sentence] = answers
 
 rev_hits = waitUntilHIT1Complete(mtc,hitIds)
@@ -332,7 +343,8 @@ for hit in rev_hits:
 
 translations = {}
 
-for sentence, dic in votes.iteritems():
+for key, dic in votes.iteritems():
+	sentence, context = key
 	translations[sentence] = answersDic[sentence][keyWithMaxVal(dic)]
 
 for sentence in sentences:
