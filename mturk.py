@@ -7,10 +7,10 @@ from sets import Set
 import time
 from collections import defaultdict
 
-HIT1_MAX_ASSIGN = 1
-HIT2_MAX_ASSIGN = 1
+HIT1_MAX_ASSIGN = 3
+HIT2_MAX_ASSIGN = 6
 
-SANDBOX = True
+SANDBOX = False
 
 def createQualification(language): #returns the qualType
 	title = "English to " + language + " Translator Qualification"
@@ -89,8 +89,8 @@ def qualifyWorker():
 				#check answer for key words
 				if workerAnswer.find("always") and workerAnswer.find("eat") and workerAnswer.find("eggs") and workerAnswer.find("breakfast") and (workerAnswer.find("wake") or workerAnswer.find("get")):
 					mtc.grant_qualification(qualReqID)
-				else:
-					mtc.reject_qualification_request(qualReqID)
+				#else:
+					#mtc.reject_qualification(qualReqID)
 
 def createHIT1(to_trans,context):
 
@@ -137,7 +137,7 @@ def createHIT1(to_trans,context):
 				   description=description,
 				   keywords=keywords,
 				   duration = 60*5,
-	               reward=0.05,
+	               reward=0.50,
 				   qualifications=quals)
 
 	
@@ -197,7 +197,7 @@ def createHIT2(possibleAnswers,sentence, context):
 				   description=description,
 				   keywords=keywords,
 				   duration = 60*5,
-				   reward=0.05,
+				   reward=0.50,
 				   qualifications=quals)
 
 	
@@ -281,7 +281,7 @@ tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 
 sentences = tokenizer.tokenize(data)
 
-#deleteExistingHITs() #uncomment for testing
+deleteExistingHITs() #uncomment for testing
 
 for idx, sentence in enumerate(sentences):
 	context = getContext(idx,sentences)
