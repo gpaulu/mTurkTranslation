@@ -281,7 +281,7 @@ tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 
 sentences = tokenizer.tokenize(data)
 
-deleteExistingHITs() #uncomment for testing
+#deleteExistingHITs() #uncomment for testing or to remove any unwanted existing HITs
 
 for idx, sentence in enumerate(sentences):
 	context = getContext(idx,sentences)
